@@ -1,5 +1,5 @@
 from splinter import Browser
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup as bs
 import requests
 import pymongo
 import os
@@ -12,11 +12,13 @@ import time
 def scrape():
     executable_path = {'executable_path': './chromedriver.exe'}
     browser = Browser('chrome', **executable_path, headless=False)
+   
+   #Scrape NASA Mars News Site
     url = 'https://mars.nasa.gov/news/?page=0&per_page=40&order=publish_date+desc%2Ccreated_at+desc&search=&category=19%2C165%2C184%2C204&blank_scope=Latest'
     browser.visit(url)
 
     html = browser.html
-    soup = BeautifulSoup(html, 'html.parser')
+    soup = bs(html, 'html.parser')
 
     news_title = soup.find("div",class_="content_title").text
     news_p = soup.find("div", class_="article_teaser_body").text
@@ -26,39 +28,36 @@ def scrape():
     time.sleep(3)
 
 
-
-    #JPL Mars Space Images - Featured Image
+# Scrape JPL Mars Space Featured Image
     executable_path = {'executable_path': './chromedriver.exe'}
     browser = Browser('chrome', **executable_path, headless=False)
-    url_image = "https://www.jpl.nasa.gov/spaceimages/?search=&category=Mars"
-    browser.visit(url_image)
+    jpl_image = "https://www.jpl.nasa.gov/spaceimages/?search=&category=Mars"
+    browser.visit(jpl_image)
 
     html = browser.html
-    soup = BeautifulSoup(html, 'html.parser')
+    soup = bs(html, 'html.parser')
 
     main_container = soup.select("#full_image")[0]["data-fancybox-href"]
-    main_image_url="https://www.jpl.nasa.gov"+main_container
+    featured_image_url="https://www.jpl.nasa.gov"+main_container
     time.sleep(3)
     browser.quit()
-    print(main_image_url)
+    print(featured_image_url)
 
-    #weather twitter
-    weather_twitter_url='https://twitter.com/marswxreport?lang=en'
+#Scrape Mars Weather twitter
+    weather_url='https://twitter.com/marswxreport?lang=en'
     executable_path = {'executable_path': 'chromedriver.exe'}
     browser = Browser('chrome', **executable_path, headless=False)
-    browser.visit(weather_twitter_url)
+    browser.visit(weather_url)
 
     html = browser.html
-    weather_soup = BeautifulSoup(html, 'html.parser')
+    weather_soup = bs(html, 'html.parser')
 
     mars_weather = weather_soup.find("p", class_="TweetTextSize TweetTextSize--normal js-tweet-text tweet-text").text
     print(mars_weather)
     time.sleep(3)
     browser.quit()
 
-#Mars Facts¶
-#Visit the Mars Facts webpage here and use Pandas to scrape the table containing facts about the planet including Diameter, Mass, etc. Use Pandas to convert the data to a HTML table string.
-
+#Mars Facts
     mars_facts_url='https://space-facts.com/mars/'
     facts_table = pd.read_html(mars_facts_url)
     facts_table
@@ -71,7 +70,8 @@ def scrape():
     print(df_facts_html)
     time.sleep(3)
     browser.quit()
-#Mars Hemispheres
+    
+#Scrape USGS Astro for Mars Hemispheres images
     executable_path = {'executable_path': './chromedriver.exe'}
     browser = Browser('chrome', **executable_path, headless=False)
 
